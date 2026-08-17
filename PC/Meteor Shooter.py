@@ -2,9 +2,9 @@ import os
 
 try:
     default_pygame_support_prompt = os.environ['PYGAME_HIDE_SUPPORT_PROMPT']
-    os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 except KeyError:
-    os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+    pass
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
 
@@ -34,8 +34,10 @@ SCREEN_HEIGHT: int = 512
 width_scaling = SCREEN_WIDTH / 128
 height_scaling = SCREEN_HEIGHT / 128
 
+version = 0.3
+
 pygame.init()
-pygame.display.set_caption('Meteor Shooter')
+pygame.display.set_caption(f'Meteor Shooter {version}')
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 font = pygame.font.SysFont('Arial', 36)
@@ -46,7 +48,9 @@ ship = {
 
 ship['width'] = ship['image'].get_width() * width_scaling
 ship['height'] = ship['image'].get_height() * height_scaling
-ship['image'] = pygame.transform.scale(ship['image'], (ship['width'], ship['height']))
+ship['image'] = pygame.transform.scale(ship['image'],
+                                       (ship['width'],
+                                        ship['height']))
 ship['x'] = SCREEN_WIDTH // 2 - ship['width'] // 2
 ship['y'] = SCREEN_HEIGHT - ship['height']
 ship['mask'] = pygame.mask.from_surface(ship['image'].convert_alpha())
@@ -59,7 +63,9 @@ asteroid['width'] = asteroid['image'].get_width() * width_scaling
 asteroid['height'] = asteroid['image'].get_height() * height_scaling
 asteroid['x'] = random.randint(0, int(SCREEN_WIDTH - asteroid['width']))
 asteroid['y'] = -asteroid['height']
-asteroid['image'] = pygame.transform.scale(asteroid['image'], (asteroid['width'], asteroid['height']))
+asteroid['image'] = pygame.transform.scale(asteroid['image'],
+                                           (asteroid['width'],
+                                            asteroid['height']))
 asteroid['mask'] = pygame.mask.from_surface(asteroid['image'].convert_alpha())
 
 lasers = {
@@ -85,14 +91,20 @@ asteroid['speed_y'] = max_at_value((ASTEROID_BASE_SPEED + meteors_shot / 10 * AS
 FPS = 50
 game_over = False
 running = True
+game_over_cause = 'error'
+a = None
 while running:
     if not game_over:
         # game over detection
         if ship['mask'].overlap(asteroid['mask'],
                                 (asteroid['x'] - ship['x'],
-                                 asteroid['y'] - ship['y'])) is not None or asteroid['y'] > SCREEN_HEIGHT:
+                                 asteroid['y'] - ship['y'])) is not None:
             game_over = True
-
+            game_over_cause = 'Collided with the meteor'
+        elif asteroid['y'] > SCREEN_HEIGHT:
+            game_over = True
+            game_over_cause = 'Meteor went off-screen'
+        
         # destroy asteroids
         for i in range(len(lasers['entities'])):
             if asteroid['mask'].overlap(lasers['mask'],
@@ -106,15 +118,16 @@ while running:
                     score_multiplier = 3 / 2
                 elif meteors_shot == 100:
                     score_multiplier = 2
-
+                
                 if not over_max_value:
                     asteroid['speed_y'] = max_at_value((ASTEROID_BASE_SPEED + meteors_shot * ASTEROID_SPEED_ACCELERATION) * height_scaling, max_value)
                 if asteroid['speed_y'] == max_value:
                     over_max_value = True
                 lasers['entities'][i]['destroyed'] = True
-                asteroid['x'] = random.randint(0, int(SCREEN_WIDTH - asteroid['width']))
+                asteroid['x'] = random.randint(0,
+                                               int(SCREEN_WIDTH - asteroid['width']))
                 asteroid['y'] = -asteroid['height']
-
+        
         # move lasers
         for i in range(len(lasers['entities'])):
             lasers['entities'][i]['y'] -= 4
@@ -129,18 +142,33 @@ while running:
                     break
                 elif i == len(lasers['entities']) - 1:
                     destroyed_lasers_exist = False
-
+    
     # handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN and not game_over:
-            if event.key == pygame.K_SPACE:
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and not game_over:
                 lasers['entities'].append({
                     'x': ship['x'] + (ship['width'] // 2) - (lasers['width'] // 2),
                     'y': SCREEN_HEIGHT - ship['height'] - lasers['height'],
                     'destroyed': False
                 })
+            if event.key == pygame.K_r and game_over:
+                score = 0
+                meteors_shot = 0
+                score_multiplier = 1
+                ASTEROID_BASE_SPEED = 0.5
+                ASTEROID_SPEED_ACCELERATION = 0.05
+                max_value = 6.5
+                over_max_value = False
+                ship['x'] = SCREEN_WIDTH // 2 - ship['width'] // 2
+                asteroid['x'] = random.randint(0,
+                                               int(SCREEN_WIDTH - asteroid['width']))
+                asteroid['y'] = -asteroid['height']
+                asteroid['speed_y'] = max_at_value((ASTEROID_BASE_SPEED + meteors_shot / 10 * ASTEROID_SPEED_ACCELERATION) * height_scaling, max_value)
+                game_over_cause = 'error'
+                game_over = False
     if not game_over:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
@@ -159,7 +187,7 @@ while running:
                     ship['speed_x'] += 1
                 else:
                     ship['speed_x'] = 0
-
+        
         # move ship
         if ship['x'] + ship['speed_x'] < 0:
             ship['x'] = 0
@@ -169,28 +197,42 @@ while running:
             ship['speed_x'] = 0
         else:
             ship['x'] += ship['speed_x']
-
+        
         # move asteroid
         asteroid['y'] += asteroid['speed_y']
-
-        # render the scene
-        screen.fill((0, 0, 0))
-        for i in lasers['entities']:
-            screen.blit(lasers['image'], (i['x'], i['y']))
-        screen.blit(ship['image'], (ship['x'], ship['y']))
-        screen.blit(asteroid['image'], (asteroid['x'], asteroid['y']))
-        if score % 1 == 0:
-            score_text = font.render('Score: ' + str(int(score)), True, (255, 255, 255))
-        elif score % 0.1 == 0:
-            score_text = font.render('Score: ' + str(round(score, 1)), True, (255, 255, 255))
-        else:
-            score_text = font.render('Score: ' + str(round(score, 2)), True, (255, 255, 255))
-        screen.blit(score_text, (0, 0))
+    
+    # render the scene
+    screen.fill((0, 0, 0))
+    for i in lasers['entities']:
+        screen.blit(lasers['image'], (i['x'], i['y']))
+    screen.blit(ship['image'], (ship['x'], ship['y']))
+    screen.blit(asteroid['image'], (asteroid['x'], asteroid['y']))
+    if score % 1 == 0:
+        score_to_display = int(score)
+    elif score % 0.1 == 0:
+        score_to_display = round(score, 1)
     else:
+        score_to_display = round(score, 2)
+    score_text = font.render(f'Score: {score_to_display}',
+                             True,
+                             (255, 255, 255))
+    screen.blit(score_text, (0, 0))
+    
+    if game_over:
         game_over_text = font.render('Game Over!', True, (255, 255, 255))
         screen.blit(game_over_text,
-                    (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2,
-                     SCREEN_HEIGHT // 2 - game_over_text.get_height() // 2))
+                    (int(SCREEN_WIDTH / 2 - game_over_text.get_width() / 2),
+                     int(SCREEN_HEIGHT / 2 - game_over_text.get_height() * 2)))
+        game_over_cause_text = font.render(game_over_cause,
+                                           True,
+                                           (255, 255, 255))
+        screen.blit(game_over_cause_text,
+                    (SCREEN_WIDTH // 2 - game_over_cause_text.get_width() // 2,
+                     SCREEN_HEIGHT // 2 - game_over_cause_text.get_height()))
+        retry_text = font.render('Press R to retry', True, (255, 255, 255))
+        screen.blit(retry_text,
+                    (SCREEN_WIDTH // 2 - retry_text.get_width() // 2,
+                     SCREEN_HEIGHT // 2))
     pygame.display.flip()
     pygame.time.Clock().tick(FPS)
 
