@@ -34,11 +34,13 @@ SCREEN_HEIGHT: int = 512
 width_scaling = SCREEN_WIDTH / 128
 height_scaling = SCREEN_HEIGHT / 128
 
-version = 0.3
+version = 0.4
+shipXchngBy = 52*width_scaling #fun fact ime je isto kao u micropython verzijama
 
 pygame.init()
 pygame.display.set_caption(f'Meteor Shooter {version}')
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+clock = pygame.time.Clock()
 
 font = pygame.font.SysFont('Arial', 36)
 
@@ -51,7 +53,7 @@ ship['height'] = ship['image'].get_height() * height_scaling
 ship['image'] = pygame.transform.scale(ship['image'],
                                        (ship['width'],
                                         ship['height']))
-ship['x'] = SCREEN_WIDTH // 2 - ship['width'] // 2
+ship['x'] = -4
 ship['y'] = SCREEN_HEIGHT - ship['height']
 ship['mask'] = pygame.mask.from_surface(ship['image'].convert_alpha())
 ship['speed_x'] = 0
@@ -61,7 +63,7 @@ asteroid = {
 }
 asteroid['width'] = asteroid['image'].get_width() * width_scaling
 asteroid['height'] = asteroid['image'].get_height() * height_scaling
-asteroid['x'] = random.randint(0, int(SCREEN_WIDTH - asteroid['width']))
+asteroid['x'] = random.randint(0, 2) * shipXchngBy
 asteroid['y'] = -asteroid['height']
 asteroid['image'] = pygame.transform.scale(asteroid['image'],
                                            (asteroid['width'],
@@ -92,8 +94,9 @@ FPS = 50
 game_over = False
 running = True
 game_over_cause = 'error'
-a = None
 while running:
+    clock.tick(FPS)
+    pygame.display.set_caption(f'Meteor Shooter {version}')# | target {FPS} FPS, actual {round(clock.get_fps(), 2)} FPS')
     if not game_over:
         # game over detection
         if ship['mask'].overlap(asteroid['mask'],
@@ -124,8 +127,7 @@ while running:
                 if asteroid['speed_y'] == max_value:
                     over_max_value = True
                 lasers['entities'][i]['destroyed'] = True
-                asteroid['x'] = random.randint(0,
-                                               int(SCREEN_WIDTH - asteroid['width']))
+                asteroid['x'] = random.randint(0, 2) * shipXchngBy
                 asteroid['y'] = -asteroid['height']
         
         # move lasers
@@ -148,13 +150,22 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and not game_over:
+          if not game_over:
+            if event.key == pygame.K_SPACE:
                 lasers['entities'].append({
                     'x': ship['x'] + (ship['width'] // 2) - (lasers['width'] // 2),
                     'y': SCREEN_HEIGHT - ship['height'] - lasers['height'],
                     'destroyed': False
                 })
-            if event.key == pygame.K_r and game_over:
+            # movement
+            elif event.key == pygame.K_LEFT:
+              if not ship['x'] - shipXchngBy < -4:
+                ship['x'] -= shipXchngBy
+            elif event.key == pygame.K_RIGHT:
+              if not ship['x'] + shipXchngBy > 512:
+                ship['x'] += shipXchngBy
+          else:
+            if event.key == pygame.K_r:
                 score = 0
                 meteors_shot = 0
                 score_multiplier = 1
@@ -162,9 +173,8 @@ while running:
                 ASTEROID_SPEED_ACCELERATION = 0.05
                 max_value = 6.5
                 over_max_value = False
-                ship['x'] = SCREEN_WIDTH // 2 - ship['width'] // 2
-                asteroid['x'] = random.randint(0,
-                                               int(SCREEN_WIDTH - asteroid['width']))
+                ship['x'] = -4
+                asteroid['x'] = random.randint(0, 2) * shipXchngBy
                 asteroid['y'] = -asteroid['height']
                 asteroid['speed_y'] = max_at_value((ASTEROID_BASE_SPEED + meteors_shot / 10 * ASTEROID_SPEED_ACCELERATION) * height_scaling, max_value)
                 game_over_cause = 'error'
@@ -187,16 +197,6 @@ while running:
                     ship['speed_x'] += 1
                 else:
                     ship['speed_x'] = 0
-        
-        # move ship
-        if ship['x'] + ship['speed_x'] < 0:
-            ship['x'] = 0
-            ship['speed_x'] = 0
-        elif ship['x'] + ship['speed_x'] > SCREEN_WIDTH - ship['width']:
-            ship['x'] = SCREEN_WIDTH - ship['width']
-            ship['speed_x'] = 0
-        else:
-            ship['x'] += ship['speed_x']
         
         # move asteroid
         asteroid['y'] += asteroid['speed_y']
