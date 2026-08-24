@@ -1,4 +1,34 @@
-import os
+import sys
+
+version = '0.3.1'
+
+#flags
+nerd = False
+nerd_mode_activator_flags = ['--nerd', '-n', '--fps-info', '-fps']
+help_text_flags = ['--help', '-h']
+help_text = f"""Meteor Shooter {version}
+ONLY ONE FLAG AT A TIME!
+Flags:
+--nerd, -n, --fps-info, -fps: show FPS info in title bar, but hides game info
+--help, -h: show this"""
+
+flag = sys.argv[1] if len(sys.argv) > 1 else ""
+
+if flag in nerd_mode_activator_flags:
+    nerd = True
+    if flag in ('--nerd', '-n'):
+        print('NEEEEEEEEEEEEEEEEEEEEEERD')
+
+elif flag in help_text_flags:
+    print(help_text)
+    sys.exit(0)
+
+elif flag != "":
+    print(f"Error: Unknown flag '{flag}'")
+    print(help_text)
+    sys.exit(1)
+
+import os, pygame, random
 
 try:
     default_pygame_support_prompt = os.environ['PYGAME_HIDE_SUPPORT_PROMPT']
@@ -6,15 +36,10 @@ except KeyError:
     pass
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-import pygame
-
 try:
     os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = default_pygame_support_prompt
 except NameError:
     os.environ.pop('PYGAME_HIDE_SUPPORT_PROMPT')
-
-import random
-import sys
 
 def find_real_path(relative_path):
     try:
@@ -34,11 +59,11 @@ SCREEN_HEIGHT: int = 512
 width_scaling = SCREEN_WIDTH / 128
 height_scaling = SCREEN_HEIGHT / 128
 
-version = 0.3
 
 pygame.init()
 pygame.display.set_caption(f'Meteor Shooter {version}')
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+clock = pygame.time.Clock()
 
 font = pygame.font.SysFont('Arial', 36)
 
@@ -94,6 +119,9 @@ running = True
 game_over_cause = 'error'
 a = None
 while running:
+    if nerd:
+        clock.tick(FPS)
+        pygame.display.set_caption(f'target {FPS} FPS, actual {round(clock.get_fps(), 2)} FPS, error {round(abs(FPS-clock.get_fps()), 2)} FPS')
     if not game_over:
         # game over detection
         if ship['mask'].overlap(asteroid['mask'],
@@ -162,7 +190,9 @@ while running:
                 ASTEROID_SPEED_ACCELERATION = 0.05
                 max_value = 6.5
                 over_max_value = False
+                lasers['entities'] = []
                 ship['x'] = SCREEN_WIDTH // 2 - ship['width'] // 2
+                ship['speed_x'] = 0
                 asteroid['x'] = random.randint(0,
                                                int(SCREEN_WIDTH - asteroid['width']))
                 asteroid['y'] = -asteroid['height']
