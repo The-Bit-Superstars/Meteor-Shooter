@@ -1,1 +1,1 @@
-https://github.com/MrUsername7/MeteorShooter/raw/refs/heads/main/PC/binary/Meteor%20Shooter.exe
+https://github.com/MrUsername7/MeteorShooter/raw/refs/heads/main/PC/dist/Meteor%20Shooter.exe
