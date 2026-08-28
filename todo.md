@@ -19,9 +19,9 @@
   * Crna rupa (5s)
 * planete i zvijezde u pozadini \[A.H. + L.V.]
 * multiplayer \[P.P. + L.V.]
-* ako meteor koji možeš upucati prođe pored rakete izgubiš 1 život \[L.V.]
-* opis nadogradnji \[L.V.]
-* bolji ekran za pomoć \[L.V.]
+* ~~ako meteor koji možeš upucati prođe pored rakete izgubiš 1 život \[L.V.]~~
+* ~~opis nadogradnji \[L.V.]~~ (otkazano, imena nadogradnji objasne sebe)
+* bolji ekran za pomoć \[L.V.] (polunapravljeno)
 * vidljivo razbijanje meteora \[A.H. + L.V.]
 * lore \[A.H. + L.V.]
 
