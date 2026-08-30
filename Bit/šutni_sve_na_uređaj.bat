@@ -23,14 +23,18 @@ mpremote resume cp flags/en.rgb565 :flags/en.rgb565
 mpremote resume cp flags/hr.rgb565 :flags/hr.rgb565
 
 mpremote resume mkdir skins
+
 mpremote resume mkdir skins/ships
 mpremote resume cp skins/ships/default.rgb565 :skins/ships/default.rgb565
 mpremote resume cp skins/ships/french.rgb565 :skins/ships/french.rgb565
 mpremote resume cp skins/ships/croatia.rgb565 :skins/ships/croatia.rgb565
+mpremote resume cp skins/ships/school1.rgb565 :skins/ships/school1.rgb565
+mpremote resume cp skins/ships/school2.rgb565 :skins/ships/school2.rgb565
 
 mpremote resume mkdir skins/lasers
 mpremote resume cp skins/lasers/default.rgb565 :skins/lasers/default.rgb565
 mpremote resume cp skins/lasers/french.rgb565 :skins/lasers/french.rgb565
 mpremote resume cp skins/lasers/croatia.rgb565 :skins/lasers/croatia.rgb565
+mpremote resume cp skins/lasers/school.rgb565 :skins/lasers/school.rgb565
 
 echo Kopirano! Samo napravi reset.
