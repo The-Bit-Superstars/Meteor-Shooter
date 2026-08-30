@@ -10,7 +10,7 @@ def connected():
   else: return ''
 
 en = [
-"for Bit",
+'Back2School >:/', #"for Bit",
 "Textures:",
 "Programming:",
 "EMULATED",
@@ -58,11 +58,13 @@ en = [
 'French',
 'Croatia',
 'Bus',
-'B2 Spirit'
+'B2 Spirit',
+'B2S Skin 1',
+'B2S Skin 2'
 ]
 
 hr = [
-"za Bit",
+'Back2School >:/', #"za Bit",
 "Teksture:",
 "Programiranje:",
 "EMULIRANO",
@@ -110,11 +112,13 @@ hr = [
 'Francuska',
 'Hrvatska',
 'Bus',
-'B2 Spirit'
+'B2 Spirit',
+'B2S Skin 1'
+'B2S Skin 2'
 ]
 
 de = [
-'fuer Bit',
+'Back2School >:/', #'fuer Bit',
 'Texturen:',
 'Programmierung:',
 'EMULIERT',
@@ -162,7 +166,9 @@ de = [
 'Franzoesiche(s)',
 'Kroatien',
 'Bus',
-'B2 Spirit'
+'B2 Spirit',
+'B2S Skin 1',
+'B2S Skin 2'
 ]
 
 es = []

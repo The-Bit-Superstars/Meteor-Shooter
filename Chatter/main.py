@@ -14,9 +14,18 @@ menus:
 11: listNetworks
 12: langSelectOnStartup
 13: skins
+
+skins:
+default:   683d5113-3ee2-41bd-96eb-8532b19acc6b
+french:    4df7f35e-1f99-46b0-ab23-098a273e3f92
+croatia:   a59c3e34-5264-48b5-9daf-15dd051a14fa
+bus:       232f7bc2-5264-4aef-977a-d3f3c7a0658e
+b2 spirit: d4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c
+school 1:  5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe
+school 2:  ecb90661-85f0-4263-8726-aa6795a2653e
 """
 
-version = "1.6.3"
+version = "1.7.0"
 # DEVEX znači DEVeloper EXchange
 version_type = 'RELEASE'
 version_type = version_type.upper()
@@ -39,10 +48,10 @@ meteor_type = [0,0,0]
 sprite_asteroid = [FrameBuffer(asteroidTypeSprite[meteor_type[0]][0], 27, 25, RGB565), FrameBuffer(asteroidTypeSprite[meteor_type[1]][0], 27, 25, RGB565), FrameBuffer(asteroidTypeSprite[meteor_type[2]][0], 27, 25, RGB565)]
 sprite_asteroid_transparent = [asteroidTypeSprite[meteor_type[0]][1], asteroidTypeSprite[meteor_type[1]][1], asteroidTypeSprite[meteor_type[2]][1]]
 sprite_cup = FrameBuffer(cupSprite[3], cupSprite[0], cupSprite[1], RGB565)
-sprite_ship = FrameBuffer(shipSkinSprite[skin][3], shipSkinSprite[skin][0], shipSkinSprite[skin][1], RGB565)
-sprite_ship_transparent = shipSkinSprite[skin][2]
-sprite_laser = FrameBuffer(laserSkinSprite[skin][3], laserSkinSprite[skin][0], laserSkinSprite[skin][1], RGB565)
-sprite_laser_transparent = laserSkinSprite[skin][2]
+sprite_ship = FrameBuffer(shipSkinSprite[0][3], shipSkinSprite[0][0], shipSkinSprite[0][1], RGB565)
+sprite_ship_transparent = shipSkinSprite[0][2]
+sprite_laser = FrameBuffer(laserSkinSprite[0][3], laserSkinSprite[0][0], laserSkinSprite[0][1], RGB565)
+sprite_laser_transparent = laserSkinSprite[0][2]
 sprite_life2times = FrameBuffer(life2timesSprite[3], life2timesSprite[0], life2timesSprite[1], RGB565)
 sprite_life = FrameBuffer(lifeSprite[3], lifeSprite[0], lifeSprite[1], RGB565)
 sprite_alien = FrameBuffer(alienSprite[3], alienSprite[0], alienSprite[1], RGB565)
@@ -243,7 +252,7 @@ ssid = None
 pswd = None
 running = True
 networks = None
-unlockedSkins = [2, 0, 0, 0, 0]
+unlockedSkins = [2, 0, 0, 1, 1] #0, 0, #
 
 def save():
   with open('data.txt', 'w') as f:
@@ -348,11 +357,49 @@ def startup():
         display.commit()
 
 def setskin():
-    global skin, sprite_ship, sprite_ship_transparent, sprite_laser, sprite_laser_transparent
-    sprite_ship = FrameBuffer(shipSkinSprite[skin][3], shipSkinSprite[skin][0], shipSkinSprite[skin][1], RGB565)
-    sprite_ship_transparent = shipSkinSprite[skin][2]
-    sprite_laser = FrameBuffer(laserSkinSprite[skin][3], laserSkinSprite[skin][0], laserSkinSprite[skin][1], RGB565)
-    sprite_laser_transparent = laserSkinSprite[skin][2]
+    global skin, sprite_ship, sprite_ship_transparent, sprite_laser, sprite_laser_transparent, sprite_asteroid, sprite_asteroid_transparent
+    #default
+    if skin == '683d5113-3ee2-41bd-96eb-8532b19acc6b':
+        skinToSet = 0
+    #french
+    elif skin == '4df7f35e-1f99-46b0-ab23-098a273e3f92':
+        skinToSet = 1
+    #croatia
+    elif skin == 'a59c3e34-5264-48b5-9daf-15dd051a14fa':
+        skinToSet = 2
+    #bus
+    #elif skin == '232f7bc2-5264-4aef-977a-d3f3c7a0658e':
+    #    skinToSet = 3
+    #b2
+    #elif skin == 'd4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c':
+    #    skinToSet = 4
+    #school1
+    elif skin == '5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe':
+        skinToSet = 3
+    #school2
+    elif skin == 'ecb90661-85f0-4263-8726-aa6795a2653e':
+        skinToSet = 4
+    #fallback
+    else:
+        skinToSet = 0
+
+    if skinToSet == 3:
+        meteor_type = [2,2,2]
+    elif skinToSet == 4:
+        meteor_type = [3,3,3]
+    else:
+        meteor_type = [0,0,0]
+
+    sprite_ship = FrameBuffer(shipSkinSprite[skinToSet][3], shipSkinSprite[skinToSet][0], shipSkinSprite[skinToSet][1], RGB565)
+    sprite_ship_transparent = shipSkinSprite[skinToSet][2]
+    sprite_laser = FrameBuffer(laserSkinSprite[skinToSet][3], laserSkinSprite[skinToSet][0], laserSkinSprite[skinToSet][1], RGB565)
+    sprite_laser_transparent = laserSkinSprite[skinToSet][2]
+    sprite_asteroid = [FrameBuffer(asteroidTypeSprite[meteor_type[0]][0], 27, 25, RGB565),
+                       FrameBuffer(asteroidTypeSprite[meteor_type[1]][0], 27, 25, RGB565),
+                       FrameBuffer(asteroidTypeSprite[meteor_type[2]][0], 27, 25, RGB565)]
+    sprite_asteroid_transparent = [asteroidTypeSprite[meteor_type[0]][1],
+                                   asteroidTypeSprite[meteor_type[1]][1],
+                                   asteroidTypeSprite[meteor_type[2]][1]]
 
 def shuffle(array):
     global lives, select, livesTick
@@ -383,14 +430,15 @@ def about():
   select = 0
   display.fill(16)
   display.text("Meteor Shooter", 8+offsetX, 0, 65535)
-  display.text(lang[0], 36+offsetX, 8, 65535)
-  display.text(version, 0+offsetX, 20, 65535)
-  display.text(lang[1], 0+offsetX, 28, 65535)
-  display.text("Adrian", 8+offsetX, 36, 65535)
-  display.text(lang[2], 0+offsetX, 54, 65535)
-  display.text("Leon", 8+offsetX, 60, 65535)
-  display.text(lang[32], 0+offsetX, 76, 65535)
-  display.text("Leon", 8+offsetX, 84, 65535)
+  display.text(lang[0], 64-len(lang[0])*4+offsetX, 8, 65535)
+  display.text(version, 0+offsetX, 16, 65535)
+  display.text(lang[1], 0+offsetX, 24, 65535)
+  display.text("Adrian", 8+offsetX, 32, 65535)
+  display.text("Leon", 8+offsetX, 40, 65535)
+  display.text(lang[2], 0+offsetX, 56, 65535)
+  display.text("Leon", 8+offsetX, 64, 65535)
+  display.text(lang[32], 0+offsetX, 80, 65535)
+  display.text("Leon", 8+offsetX, 88, 65535)
   display.text(lang[4], 64-len(lang[4])*4+offsetX, 120, 65535)
   display.commit()
 
@@ -462,12 +510,18 @@ def skinitem():
   elif select == 2:
     item = lang[46]
     value = 1000
+# elif select == 3:
+#   item = lang[47]
+#   value = 1000
+# elif select == 4:
+#   item = lang[48]
+#   value = 1000
   elif select == 3:
-    item = lang[47]
-    value = 1000
+    item = lang[49]
+    value = 0
   elif select == 4:
-    item = lang[48]
-    value = 1000
+    item = lang[50]
+    value = 0
   else:
     item = 'ERR01'
   if unlockedSkins[select]:
@@ -931,7 +985,30 @@ def aButton():
       display.blit(sprite_qr, 0, 0, 0)
       display.commit()
     elif select == 6:
-      select = skin
+      #default
+      if skin == '683d5113-3ee2-41bd-96eb-8532b19acc6b':
+        select = 0
+      #french
+      elif skin == '4df7f35e-1f99-46b0-ab23-098a273e3f92':
+        select = 1
+      #croatia
+      elif skin == 'a59c3e34-5264-48b5-9daf-15dd051a14fa':
+        select = 2
+      #bus
+     #elif skin == '232f7bc2-5264-4aef-977a-d3f3c7a0658e':
+     #  select = 3
+      #b2
+     #elif skin == 'd4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c':
+     #  select = 4
+      #school1
+      elif skin == '5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe':
+        select = 3
+      #school2
+      elif skin == 'ecb90661-85f0-4263-8726-aa6795a2653e':
+        select = 4
+      #fallback
+      else:
+        select = 0
       menu = 13
       buymenu()
   elif menu == 2:
@@ -1102,7 +1179,30 @@ def aButton():
           if unlockedSkins[i] == 2:
             unlockedSkins[i] = 1
         unlockedSkins[select] = 2
-        skin = select
+        #default
+        if select == 0:
+          skin = '683d5113-3ee2-41bd-96eb-8532b19acc6b'
+        #french
+        elif select == 1:
+          skin = '4df7f35e-1f99-46b0-ab23-098a273e3f92'
+        #croatia
+        elif select == 2:
+          skin = 'a59c3e34-5264-48b5-9daf-15dd051a14fa'
+        #bus
+        #elif select == 3:
+        # skin = '232f7bc2-5264-4aef-977a-d3f3c7a0658e'
+        #b2
+        #elif select == 4:
+        # skin = 'd4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c'
+        #school1
+        elif select == 3:
+          skin = '5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe'
+        #school2
+        elif select == 4:
+          skin = 'ecb90661-85f0-4263-8726-aa6795a2653e'
+        #fallback
+        else:
+          skin = '683d5113-3ee2-41bd-96eb-8532b19acc6b'
         setskin()
         buymenu()
       if tone: piezo.tone(125, 50)
@@ -1123,41 +1223,6 @@ def menuButton():
     menu = 1
     mainmenu()
     scroll()
-  elif menu == 1:
-    import binascii
-    print('devtools id required')
-    id = str(input('devtools id: '))
-    if id == bytes.fromhex('32623334306265362d663466662d346636622d396264662d326332633261363035383832').decode():
-      try:
-        while True:
-          print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ndevtools\nKeyboardInterrupt to exit\n1: set specified variable to input')
-          option = int(input())
-          if option == 1:
-            print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ndevtools\nwhich variable\n1: money\n2: more coins\n3: stronger laser\n4: more meteors\n5: faster laser\n6: lives\n7: livesTick')
-            option = int(input())
-            suboption = int(input('set to:\n'))
-            global money, coinsUpg, laser, meteors, fastl, lives, livesTick
-            if option == 1:
-              money = suboption
-            elif option == 2:
-              coinsUpg = suboption
-            elif option == 3:
-              laser = suboption
-            elif option == 4:
-              meteors = suboption
-            elif option == 5:
-              fastl = suboption
-            elif option == 6:
-              lives = suboption
-            elif option == 7:
-              livesTick = suboption
-      except BaseException as e:
-        if e == KeyboardInterrupt:
-          print('devtools exit')
-        else:
-          print(type(e).__name__ + ": " + str(e))
-    else:
-      print('Invalid DevTools ID given')
   elif menu == 8:
     LVK.shiftLock()
 buttons.on_press(menu_button, menuButton)
@@ -1232,7 +1297,7 @@ def rightButton():
     buymenu2(16, 0, 2)
     buyscrollr(0, -72, 3)
     buymenu2(0, 16, -2)
-    select = (select+1)%3
+    select = (select+1)%5
     buymenu()
     skinitem()
 buttons.on_press(right_button, rightButton)
@@ -1258,7 +1323,7 @@ def leftButton():
     buymenu2(16, 0, 2)
     buyscrollr(0, 72, -3)
     buymenu2(0, 16, -2)
-    select = (select-1)%3
+    select = (select-1)%5
     buymenu()
     skinitem()
 buttons.on_press(left_button, leftButton)
