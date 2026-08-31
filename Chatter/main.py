@@ -25,7 +25,7 @@ school 1:  5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe
 school 2:  ecb90661-85f0-4263-8726-aa6795a2653e
 """
 
-version = "1.7.0"
+version = "1.8.0"
 # DEVEX znači DEVeloper EXchange
 version_type = 'RELEASE'
 version_type = version_type.upper()
@@ -252,56 +252,100 @@ ssid = None
 pswd = None
 running = True
 networks = None
-unlockedSkins = [2, 0, 0, 1, 1] #0, 0, #
+unlockedSkins = {
+    '683d5113-3ee2-41bd-96eb-8532b19acc6b': 2,
+    '4df7f35e-1f99-46b0-ab23-098a273e3f92': 0,
+    'a59c3e34-5264-48b5-9daf-15dd051a14fa': 0,
+    '232f7bc2-5264-4aef-977a-d3f3c7a0658e': 0,
+    'd4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c': 0,
+    '5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe': 1,
+    'ecb90661-85f0-4263-8726-aa6795a2653e': 1
+}
 
 def save():
-  with open('data.txt', 'w') as f:
+  with open('data.txt', 'wb') as f:
     global money, laser, meteors, coinsUpg, tone, totalDistance, lang, fastl, skin, unlockedSkins
-    f.write(str(money)+'\n')
-    f.write(str(laser)+'\n')
-    f.write(str(meteors)+'\n')
-    f.write(str(coinsUpg)+'\n')
-    f.write(str(tone)+'\n')
-    f.write(str(totalDistance)+'\n')
+    f.write('SAV2\x0F\x1F')
+    f.write(str(money)+'\x0F\x1F')
+    f.write(str(laser)+'\x0F\x1F')
+    f.write(str(meteors)+'\x0F\x1F')
+    f.write(str(coinsUpg)+'\x0F\x1F')
+    f.write(str(tone)+'\x0F\x1F')
+    f.write(str(totalDistance)+'\x0F\x1F')
     if lang == lang_en:
-      f.write('en\n')
+      f.write('en\x0F\x1F')
     elif lang == lang_hr:
-      f.write('hr\n')
+      f.write('hr\x0F\x1F')
     elif lang == lang_de:
-      f.write('de\n')
+      f.write('de\x0F\x1F')
     elif lang == lang_es:
-      f.write('es\n')
+      f.write('es\x0F\x1F')
     elif lang == lang_fr:
-      f.write('fr\n')
-    f.write(str(fastl)+'\n')
-    f.write(str(skin)+'\n')
-    f.write(str(unlockedSkins)+'\n')
+      f.write('fr\x0F\x1F')
+    f.write(str(fastl)+'\x0F\x1F')
+    f.write(str(skin)+'\x0F\x1F')
+    f.write(str(unlockedSkins)+'\x0F\x1F\n')
 
 def load():
   try:
-    with open('data.txt', 'r') as f:
+    with open('data.txt', 'rb') as f:
       global money, laser, meteors, coinsUpg, tone, totalDistance, lang, fastl, skin, unlockedSkins
-      money = float(f.readline().strip())
-      laser = int(f.readline().strip())
-      meteors = int(f.readline().strip())
-      coinsUpg = int(f.readline().strip())
-      tone = f.readline().strip() == 'True'
-      totalDistance = int(f.readline().strip())
-      lang = f.readline().strip()
-      if lang == "en":
-        lang = lang_en[:]
-      elif lang == "hr":
-        lang = lang_hr[:]
-      elif lang == "de":
-        lang = lang_de[:]
-      elif lang == "es":
-        lang = lang_es[:]
-      elif lang == "fr":
-        lang = lang_fr[:]
-      fastl = int(f.readline().strip())
-      skin = int(f.readline().strip())
-      clean_elements = f.readline().strip().strip("[]").split(",")
-      unlockedSkins = [int(i) for i in clean_elements]
+      file = f.read()
+      f.seek(0)
+      if '\x0F\x1F' in file:
+        data = f.read().decode("utf-8")
+        loadedSave = [item for item in data.split('\x0F\x1F') if item != "\n"]
+        loadedSave.pop(0)
+        f.seek(0)
+        money = float(loadedSave.pop(0))
+        laser = int(loadedSave.pop(0))
+        meteors = int(loadedSave.pop(0))
+        coinsUpg = int(loadedSave.pop(0))
+        tone = loadedSave.pop(0) == 'True'
+        totalDistance = int(loadedSave.pop(0))
+        lang = loadedSave.pop(0)
+        if lang == "en":
+          lang = lang_en[:]
+        elif lang == "hr":
+          lang = lang_hr[:]
+        elif lang == "de":
+          lang = lang_de[:]
+        elif lang == "es":
+          lang = lang_es[:]
+        elif lang == "fr":
+          lang = lang_fr[:]
+        fastl = int(loadedSave.pop(0))
+        skin = str(loadedSave.pop(0))
+        import json
+        valid_json_string = loadedSave.pop(0).replace("'", '"')
+        unlockedSkins = json.loads(valid_json_string)
+      else:
+        money = float(f.readline().strip())
+        laser = int(f.readline().strip())
+        meteors = int(f.readline().strip())
+        coinsUpg = int(f.readline().strip())
+        tone = f.readline().strip() == 'True'
+        totalDistance = int(f.readline().strip())
+        lang = f.readline().strip()
+        if lang == "en":
+          lang = lang_en[:]
+        elif lang == "hr":
+          lang = lang_hr[:]
+        elif lang == "de":
+          lang = lang_de[:]
+        elif lang == "es":
+          lang = lang_es[:]
+        elif lang == "fr":
+          lang = lang_fr[:]
+        fastl = int(f.readline().strip())
+        skin = int(f.readline().strip())
+        clean_elements = f.readline.strip().strip("[]").split(",")
+        uSOV = [int(i) for i in clean_elements]
+        unlockedSkins['683d5113-3ee2-41bd-96eb-8532b19acc6b'] = uSOV.pop(0)
+        unlockedSkins['4df7f35e-1f99-46b0-ab23-098a273e3f92'] = uSOV.pop(0)
+        unlockedSkins['a59c3e34-5264-48b5-9daf-15dd051a14fa'] = uSOV.pop(0)
+        unlockedSkins['5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe'] = uSOV.pop(0)
+        unlockedSkins['ecb90661-85f0-4263-8726-aa6795a2653e'] = uSOV.pop(0)
   except:
     pass
   try:
@@ -498,6 +542,37 @@ def listNetworks():
     for i in range(len(networks)):
         draw_new_menu_items(networks[i][0].decode(), i-5)
 
+def iWontRepeatMyselfMuch(usage):
+  #default
+  if select == 0:
+    temp = '683d5113-3ee2-41bd-96eb-8532b19acc6b'
+  #french
+  elif select == 1:
+    temp = '4df7f35e-1f99-46b0-ab23-098a273e3f92'
+  #croatia
+  elif select == 2:
+    temp = 'a59c3e34-5264-48b5-9daf-15dd051a14fa'
+  #bus
+# elif select == 3:
+#   temp = '232f7bc2-5264-4aef-977a-d3f3c7a0658e'
+  #b2
+# elif select == 4:
+#   temp = 'd4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c'
+  #school1
+  elif select == 3:
+    temp = '5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe'
+  #school2
+  elif select == 4:
+    temp = 'ecb90661-85f0-4263-8726-aa6795a2653e'
+  #fallback
+  else:
+    temp = '683d5113-3ee2-41bd-96eb-8532b19acc6b'
+  if usage == 'set':
+    global skin
+    skin = temp
+  elif usage == 'return':
+    return temp
+
 def skinitem():
   global select, x, menu, laser, meteors, coinsUpg, value, fastl
   display.blit(sprite_coin, 0+offsetX, 0, 0)
@@ -524,8 +599,8 @@ def skinitem():
     value = 0
   else:
     item = 'ERR01'
-  if unlockedSkins[select]:
-    value = 9998 + unlockedSkins[select]
+  if unlockedSkins.get(iWontRepeatMyselfMuch('return')):
+    value = 9998 + unlockedSkins.get(iWontRepeatMyselfMuch('return'))
   display.blit(FrameBuffer(shipSkinSprite[select][3], shipSkinSprite[select][0], shipSkinSprite[select][1], RGB565),48,48,shipSkinSprite[select][2])
   display.blit(FrameBuffer(laserSkinSprite[select][3], laserSkinSprite[select][0], laserSkinSprite[select][1], RGB565),60,40,laserSkinSprite[select][2])
   display.text(str(item), 64-len(item)*4+offsetX, 24, 65535)
@@ -1175,34 +1250,11 @@ def aButton():
         display.text(str(money), 13+offsetX, 0, 63488)
         display.commit()
       if value == 9999:
-        for i in range(len(unlockedSkins)):
-          if unlockedSkins[i] == 2:
+        for i in unlockedSkins.keys():
+          if unlockedSkins.get(i) == 2:
             unlockedSkins[i] = 1
-        unlockedSkins[select] = 2
-        #default
-        if select == 0:
-          skin = '683d5113-3ee2-41bd-96eb-8532b19acc6b'
-        #french
-        elif select == 1:
-          skin = '4df7f35e-1f99-46b0-ab23-098a273e3f92'
-        #croatia
-        elif select == 2:
-          skin = 'a59c3e34-5264-48b5-9daf-15dd051a14fa'
-        #bus
-        #elif select == 3:
-        # skin = '232f7bc2-5264-4aef-977a-d3f3c7a0658e'
-        #b2
-        #elif select == 4:
-        # skin = 'd4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c'
-        #school1
-        elif select == 3:
-          skin = '5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe'
-        #school2
-        elif select == 4:
-          skin = 'ecb90661-85f0-4263-8726-aa6795a2653e'
-        #fallback
-        else:
-          skin = '683d5113-3ee2-41bd-96eb-8532b19acc6b'
+        unlockedSkins[iWontRepeatMyselfMuch('return')] = 2
+        iWontRepeatMyselfMuch('set')
         setskin()
         buymenu()
       if tone: piezo.tone(125, 50)

@@ -1,11 +1,11 @@
 import network, time, gc
+from Chatter import begin, display
+begin()
+display.text('boot.py 1.0.2', 64-len('boot.py 1.0.2')*4, 60, 65535)
+display.commit()
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
 print('Connected:',str(wlan.isconnected()))
-from Chatter import begin, display
-begin()
-display.text('boot.py 1.0.1', 64-len('boot.py 1.0.1')*4, 60, 65535)
-display.commit()
 gc.collect()
 try:
     gc.collect()
