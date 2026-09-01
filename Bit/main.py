@@ -25,7 +25,7 @@ school 1:  5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe
 school 2:  ecb90661-85f0-4263-8726-aa6795a2653e
 """
 
-version = "1.8.0"
+version = "1.8.1"
 # DEVEX znači DEVeloper EXchange
 version_type = 'RELEASE'
 version_type = version_type.upper()

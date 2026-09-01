@@ -113,7 +113,7 @@ hr = [
 'Hrvatska',
 'Bus',
 'B2 Spirit',
-'B2S Skin 1'
+'B2S Skin 1',
 'B2S Skin 2'
 ]
 
