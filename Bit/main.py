@@ -49,7 +49,8 @@ prices = {
     'ecb90661-85f0-4263-8726-aa6795a2653e': [0, 9999]
 }
 
-version = "1.8.2 BETA 1"
+info = 'git: 98798e9-dirty, time: 1789230785'
+version = "1.8.2 BETA 2"
 # DEVEX znači DEVeloper EXchange
 version_type = 'BETA'
 version_type = version_type.upper()
@@ -1411,7 +1412,8 @@ buttons.on_press(left_button, leftButton)
 allowed_versions = ['RELEASE', 'BETA', 'ALPHA']
 
 if version_type in allowed_versions:
-  print('Meteor Shooter',version)
+  print(f'Meteor Shooter {version}')
+  print(f'Info: {info}')
   print('Za STEMIovu Školu budućnosti')
   print('GitHub: https://github.com/The-Bit-Superstars/Meteor-Shooter')
   startup()
