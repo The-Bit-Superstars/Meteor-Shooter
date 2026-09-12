@@ -15,6 +15,14 @@ menus:
 12: langSelectOnStartup
 13: skins
 
+shop stuff:
+
+items:
+stronger laser: 18f7432b-e7cb-4d03-9956-bb658f513e38
+more meteors:   bb19d332-7d72-4bb8-97db-850ea52c2007
+more coins:     f1bcbf39-d668-46a3-8c8c-61ef0fe21cb3
+faster laser:   b9bad308-d89e-4e90-a20f-9b19e5fb65c4
+
 skins:
 default:   683d5113-3ee2-41bd-96eb-8532b19acc6b
 french:    4df7f35e-1f99-46b0-ab23-098a273e3f92
@@ -25,9 +33,25 @@ school 1:  5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe
 school 2:  ecb90661-85f0-4263-8726-aa6795a2653e
 """
 
-version = "1.8.1"
+prices = {
+    #items
+    '18f7432b-e7cb-4d03-9956-bb658f513e38': [100, 150, 9999],
+    'bb19d332-7d72-4bb8-97db-850ea52c2007': [50, 75, 9999],
+    'f1bcbf39-d668-46a3-8c8c-61ef0fe21cb3': [25, 50, 75, 100, 150, 9999],
+    'b9bad308-d89e-4e90-a20f-9b19e5fb65c4': [250, 300, 9999],
+    #skins
+    '683d5113-3ee2-41bd-96eb-8532b19acc6b': [0, 9999],
+    '4df7f35e-1f99-46b0-ab23-098a273e3f92': [1000, 9999],
+    'a59c3e34-5264-48b5-9daf-15dd051a14fa': [1000, 9999],
+    '232f7bc2-5264-4aef-977a-d3f3c7a0658e': [1000, 9999],
+    'd4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c': [1000, 9999],
+    '5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe': [0, 9999],
+    'ecb90661-85f0-4263-8726-aa6795a2653e': [0, 9999]
+}
+
+version = "1.8.2 BETA 1"
 # DEVEX znači DEVeloper EXchange
-version_type = 'RELEASE'
+version_type = 'BETA'
 version_type = version_type.upper()
 
 import network, gc, machine
@@ -346,15 +370,15 @@ def load():
         unlockedSkins['a59c3e34-5264-48b5-9daf-15dd051a14fa'] = uSOV.pop(0)
         unlockedSkins['5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe'] = uSOV.pop(0)
         unlockedSkins['ecb90661-85f0-4263-8726-aa6795a2653e'] = uSOV.pop(0)
-  except:
-    pass
+  except BaseException as e:
+    print(repr(e))
   try:
     with open('wifi.txt', 'r') as f:
       global ssid, pswd
       ssid = f.readline().strip()
       pswd = f.readline().strip()
-  except:
-    pass
+  except BaseException as e:
+    print(repr(e))
 
 def langSelectOnStartup():
   global select, menu, laser, meteors, coinsUpg, value
@@ -577,30 +601,34 @@ def skinitem():
   global select, x, menu, laser, meteors, coinsUpg, value, fastl
   display.blit(sprite_coin, 0+offsetX, 0, 0)
   display.text(str(money), 13+offsetX, 0, 65535)
+  temp = '683d5113-3ee2-41bd-96eb-8532b19acc6b'
   if select == 0:
     item = lang[44]
   elif select == 1:
     item = lang[45]
-    value = 1000
+    temp = '4df7f35e-1f99-46b0-ab23-098a273e3f92'
   elif select == 2:
     item = lang[46]
-    value = 1000
+    temp = 'a59c3e34-5264-48b5-9daf-15dd051a14fa'
 # elif select == 3:
 #   item = lang[47]
+#   temp = '232f7bc2-5264-4aef-977a-d3f3c7a0658e'
 #   value = 1000
 # elif select == 4:
 #   item = lang[48]
+#   temp = 'd4f134ac-0ce7-43cf-b5fc-4d4b4ac3560c'
 #   value = 1000
   elif select == 3:
     item = lang[49]
-    value = 0
+    temp = '5c5bbe41-fffe-44cd-a44e-ae47f8f05bfe'
   elif select == 4:
     item = lang[50]
-    value = 0
+    temp = 'ecb90661-85f0-4263-8726-aa6795a2653e'
   else:
     item = 'ERR01'
-  if unlockedSkins.get(iWontRepeatMyselfMuch('return')):
-    value = 9998 + unlockedSkins.get(iWontRepeatMyselfMuch('return'))
+  value = prices.get(temp)[0]
+  if unlockedSkins.get(temp):
+    value = 9998 + unlockedSkins.get(temp)
   display.blit(FrameBuffer(shipSkinSprite[select][3], shipSkinSprite[select][0], shipSkinSprite[select][1], RGB565),48,48,shipSkinSprite[select][2])
   display.blit(FrameBuffer(laserSkinSprite[select][3], laserSkinSprite[select][0], laserSkinSprite[select][1], RGB565),60,40,laserSkinSprite[select][2])
   display.text(str(item), 64-len(item)*4+offsetX, 24, 65535)
@@ -1396,12 +1424,12 @@ if version_type in allowed_versions:
     if lives < 0:
       lives = 0
     if menu == 0:
-      temp = random.randint(0,2)
-      if temp == 0 and selectMeteor[0]:
+      meteorToMove = random.randint(0,2)
+      if meteorToMove == 0 and selectMeteor[0]:
         meteorAY += random.randint(fVA,fVB)/fVC
-      elif temp == 1 and selectMeteor[1]:
+      elif meteorToMove == 1 and selectMeteor[1]:
         meteorBY += random.randint(fVA,fVB)/fVC
-      elif temp == 2 and selectMeteor[2]:
+      elif meteorToMove == 2 and selectMeteor[2]:
         meteorCY += random.randint(fVA,fVB)/fVC
       if meteorAY >= 130:
         mAH = 3
@@ -1441,11 +1469,11 @@ else:
   '                ',
   'GET OUT         '
   ]
-  for i in range(0,len(strings)):
-      if not strings[i] == version_type:
-          display.text(strings[i], 0, i*8, 65535)
+  for string_stuff in range(0,len(strings)):
+      if not strings[string_stuff] == version_type:
+          display.text(strings[string_stuff], 0, i*8, 65535)
       else:
-          display.text(strings[i], 0, i*8, 0x0ff0)
+          display.text(strings[string_stuff], 0, i*8, 0x0ff0)
   display.text(version, 0, 112, 0xf00f)
   display.text(version_type, 0, 120, 0xf00f)
   display.commit()
